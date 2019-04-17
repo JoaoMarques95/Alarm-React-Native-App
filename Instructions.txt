@@ -3,3 +3,11 @@ How to add  files to git
 git add /file.txt
 git commit -m 'comentario'
 git push
+
+
+To get the files already in repository:
+git pull
+
+
+-- Never forget to do the Git add, commit and push after finishing the code.
+-- Always test your code after publishing it in gitub, otherwise the other guys will clone pull your bugged 
