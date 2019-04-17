@@ -1,7 +1,7 @@
 How to add  files to git
 
 git add /file.txt
-git commit -m 'comentario'
+git commit -a -m 'comentario'
 git push
 
 
