@@ -1,3 +1,6 @@
+How to set up git
+https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes
+
 How to add  files to git
 
 git add /file.txt
