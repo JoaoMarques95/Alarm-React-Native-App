@@ -116,7 +116,7 @@ android {
     dexOptions {
         javaMaxHeapSize "4g"
     }
-    
+
     splits {
         abi {
             reset()
@@ -224,4 +224,3 @@ task copyDownloadableDepsToLibs(type: Copy) {
 
 apply plugin: 'com.google.gms.google-services'
 GoogleServicesPlugin.config.disableVersionCheck = true
-

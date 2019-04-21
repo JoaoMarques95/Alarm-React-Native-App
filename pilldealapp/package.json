@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "react": "16.8.3",
-    "react-native": "0.59.3",
+    "react-native": "^0.59.6",
+    "react-native-bluetooth-serial": "^1.0.0-rc1",
     "react-native-firebase": "^5.3.1"
   },
   "devDependencies": {
