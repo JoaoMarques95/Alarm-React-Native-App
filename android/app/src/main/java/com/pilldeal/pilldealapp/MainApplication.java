@@ -1,4 +1,4 @@
-package com.invertase.rnfirebasestarter;
+package com.pilldeal.pilldealapp;
 
 import android.app.Application;
 

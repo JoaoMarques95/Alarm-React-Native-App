@@ -105,13 +105,18 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.invertase.rnfirebasestarter"
+        applicationId "com.pilldeal.pilldealapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
     }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+    
     splits {
         abi {
             reset()
@@ -144,6 +149,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation 'com.google.firebase:firebase-core:16.0.1' //added from firebase
 
     /* ----------------------------
     *    REACT NATIVE FIREBASE
@@ -160,6 +166,9 @@ dependencies {
     /* -------------------------
     *   OPTIONAL FIREBASE SDKS
     * ------------------------- */
+
+    implementation 'com.android.support:multidex:1.0.0'
+
 
     implementation('com.google.firebase:firebase-ads:15.0.1') {
       // exclude `customtabs` as the support lib version is out of date
@@ -215,3 +224,4 @@ task copyDownloadableDepsToLibs(type: Copy) {
 
 apply plugin: 'com.google.gms.google-services'
 GoogleServicesPlugin.config.disableVersionCheck = true
+
