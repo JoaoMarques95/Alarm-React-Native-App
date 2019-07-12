@@ -7,8 +7,8 @@
 #include <PubSubClient.h>
 
 //Hardware varibles (button)
-const int buttonPin = 16;     // the number of the pushbutton pin
-const int ledPin =  5;      // the number of the LED pin
+const int buttonPin = 12;     // the number of the pushbutton pin
+const int ledPin =  14;      // the number of the LED pin
 String Click= "";
 String Reset="Reset Data";
 long timer = 0;
@@ -21,10 +21,11 @@ String t="";
 // Update these with values suitable for your network.
 //Net casa: Vodafone-2F52DD Pass:84jwUTTUaj
 //net phone: AndroidAP_5128 pass: getthejets
+//Lab_UA: defalut pass:""
 
 
-const char* ssid = "Vodafone-2F52DD";
-const char* password = "84jwUTTUaj";
+const char* ssid = "AndroidAP_5128";
+const char* password = "getthejets";
 const char* mqtt_server = "m24.cloudmqtt.com";
 const char* mqtt_user = "rgnyorkv";
 const char* mqtt_pass = "8_QL2PQKEC9B";
@@ -149,16 +150,14 @@ void loop() {
   buttonState = digitalRead(buttonPin);
 
   // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
-  if (buttonState == HIGH) {
+  if (buttonState == LOW) {
     // turn LED on:
     digitalWrite(ledPin, HIGH);
      Click = "Pressed";
-     Serial.println(Click);
-  } else if (buttonState == LOW){
+  } else if (buttonState == HIGH){
     // turn LED off:
     digitalWrite(ledPin, LOW);
     Click ="Button not cliked";
-    Serial.println(Click);
   }else{
     Serial.print("invalid option--led");
     }
@@ -175,7 +174,7 @@ String Time = dayStamp.substring(0)+" "+timeStamp.substring(0);
   
 long now = millis();
 if (Click.equals("Pressed")){
-  if (now - lastMsg > 2000) {
+  if (now - lastMsg > 1000) {
     lastMsg = now;
     ++value;
     snprintf (msg, 50, "#%ld", value);
@@ -191,6 +190,8 @@ if (Click.equals("Pressed")){
      client.publish("Clip1",payload.c_str());
      Serial.println(payload.c_str());
     }
+
+    delay(1000);
 }
 
 

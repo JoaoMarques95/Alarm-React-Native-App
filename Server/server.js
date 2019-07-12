@@ -17,13 +17,17 @@ const API_PORT = process.env.API_PORT || 3000;
 Name:Marques
 Pass:Ojk025df.
 */
-mongoose.connect(url, function(err, db) {
-  if (err) {
-    console.log("Unable to connect to the mongoDB server. Error:", err);
-  } else {
-    console.log("Connection established to", url);
+mongoose.connect(
+  url,
+  { useCreateIndex: true, useFindAndModify: false, useNewUrlParser: true },
+  function(err, db) {
+    if (err) {
+      console.log("Unable to connect to the mongoDB server. Error:", err);
+    } else {
+      console.log("Connection established to", url);
+    }
   }
-});
+);
 //===================================//
 
 //==== CONFIGURATION ===//
@@ -31,13 +35,25 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+var server = http.Server(app);
+var websocket_io = socketio(server);
 //===================================//
 
 //==== IMPORTING SHEMAS ===//
-const User = require("./models/User.js");
+const User = require("./src/models/User.js");
 //===================================//
 
-//==== MQTT COnfiguration ===//
+
+//============== NOTIFICATION  =====================// 
+require("./src/notifications/registerForPushNotificationsAsync.js")(app,User); //ading to database the notification token
+
+require('./src/notifications/post_notification.js')(User,app) //Ading logic from hours and do the post request
+
+
+//============== Cliend websokets ID =====================// adding to object only
+require("./src/sockets/main_socket.js")(websocket_io,User);
+
+//==== MQTT COnfiguration Mqtt ===//
 var client = mqtt.connect("mqtt://m24.cloudmqtt.com", {
   username: "rgnyorkv",
   password: "8_QL2PQKEC9B",
@@ -45,50 +61,45 @@ var client = mqtt.connect("mqtt://m24.cloudmqtt.com", {
 });
 
 client.on("connect", function() {
+  //Automaticamente todos os topicos!
   client.subscribe("Clip1");
   client.subscribe("Msg_Num");
 });
 
-//==== MQTT GETTING DATA OF CLICKS ===//
-save_clicks = require("./mqtt/save_clicks")(client); //guardar click e validar toma
 
-//==== IMPORTING OUR ROUTES FOLDER ===//
-fs.readdirSync(__dirname + "/routes")
+
+
+
+//==== MQTT FOLDER  ===//
+save_clicks = require("./src/mqtt/save_clicks")(client, User); //guardar click / validar e resetar toma.
+//===================================//
+
+
+//==== ROUTES FOLDER ===//
+fs.readdirSync(__dirname + "/src/routes")
   .filter(file => {
     return file.indexOf(".") !== 0 && file.slice(-3) === ".js";
   })
   .forEach(file => {
-    // routes =======It just means that require('./app/routes') returns a function.
-    //You can then call this function with another set of parantheses.
-    require(`${__dirname}/routes/${file}`)(app, User);
+    require(`${__dirname}/src/routes/${file}`)(app, User);
   });
 //===================================//
 
+
 // listen (start app with node server.js) ======================================
-let server = app.listen(API_PORT, () => {
+server.listen(API_PORT, () => {
   console.log(`Listening on port ${API_PORT}`);
 });
 //===================================//
 
-//Create Server of websokects
-//SErver and client will both point to the same web socket which is how the data is transferred between the two.
-let io = require("socket.io")(server);
-
-// The event will be called when a client is connected.
-/*
-To use the web socket, just send the data/message over a named channel.
-socket.emit('channel-name', 'Hello world!');
-
-This is identical for both server and client. The other end just has to listen to that named channel.
-socket.on('channel-name', (message) => ... some logic );
 
 
- */
 
-io.on("connection", socket => {
-  console.log("A client just joined on", socket.id);
 
-  setInterval(function() {
-    socket.emit("teste", { message: "Click" });
-  }, 1000);
-});
+
+
+
+
+
+
+

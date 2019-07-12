@@ -5,7 +5,6 @@ import {
   Image,
   Text,
   View,
-  Button,
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
@@ -14,8 +13,12 @@ import {
 import call from "react-native-phone-call";
 import Modal from "react-native-modal";
 
-//Net Casa:192.168.1.127
+//Net Casa-Aveiro:192.168.1.127
 //Net phone:192.168.43.163
+//PCI:192.168.128.1
+//PCI_Coworking:192.168.183.25
+//Net Casa:192.168.1.93
+
 var Server_IP = "http://192.168.43.163";
 
 const args = {
@@ -90,14 +93,9 @@ export default class Login extends Component {
         <ScrollView style={styles.wrapper}>
           <View style={styles.container}>
             <Image
-              source={require("../assets/logo2_blue.png")}
+              source={require("../assets/logo2.png")}
               style={styles.logo}
             />
-
-            <View style={{ flexDirection: "row", marginBottom: 50 }}>
-              <Text style={styles.header}>PillDeal,</Text>
-              <Text style={styles.header1}>Take Control</Text>
-            </View>
 
             <Text style={styles.header2}>Insira o seu nome!</Text>
             <TextInput
@@ -237,11 +235,11 @@ const styles = StyleSheet.create({
     borderRadius: 20
   },
   logo: {
-    height: 200,
+    height: 300,
     marginBottom: 20,
     marginTop: 50,
     padding: 10,
-    width: 200
+    width: 300
   },
   Icon: {
     height: 50,

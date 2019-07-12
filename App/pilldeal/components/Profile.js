@@ -18,9 +18,17 @@ import {
 import Modal from "react-native-modal";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import io from "socket.io-client";
+import { registerForPushNotificationsAsync } from "./functions/registerForPushNotificationsAsync.js";
+import {
+  Notifications,
+} from 'expo';
 
-//Net Casa:192.168.1.127
+//Net Casa-Aveiro:192.168.1.127
 //Net phone:192.168.43.163
+//PCI:192.168.128.1
+//PCI_Coworking:192.168.183.25
+//Net Casa:192.168.1.93
+
 const Server_IP = "http://192.168.43.163";
 
 export default class App extends React.Component {
@@ -37,7 +45,9 @@ export default class App extends React.Component {
       Time: "",
       Time_show: "",
       Comprimidos_Show: "",
-      ClickMessage: ""
+      Last_Click: "",
+      Estado_Toma: false,
+      notification: {}
     };
   }
 
@@ -48,23 +58,46 @@ export default class App extends React.Component {
     this.setState({ username: Name });
     this.Update_Initial_Data(Name);
 
+    //<====================================================> Calling notification register
+    registerForPushNotificationsAsync(Server_IP, Name);
+    // Handle notifications that are received or selected while the app
+    // is open. If the app was closed and then opened by tapping the
+    // notification (rather than just tapping the app icon to open it),
+    // this function will fire on the next tick after the app starts
+    // with the notification data.
+    this._notificationSubscription = Notifications.addListener(this._handleNotification);
+
+
     //<====================================================> WEB sockets CONFIG
     //we gonna do this.soket because we need to acess this varibale in any place in our component
     this.socket = io(`${Server_IP}:3000`); //just like this.state
 
     //<====================================================> WEB sockets RECEIVING DATA
-    this.socket.on("teste", function(data) {
-      console.log(data.message);
+    this.socket.on("teste", data => {
+      console.log(data, "Data from sokets");
+      this.setState({
+        Last_Click: data.Click,
+        Estado_Toma: data.Toma
+      });
     });
+
   };
 
+  componentWillUnmount(){
+    this._notificationSubscription && Notifications.removeListener(this._notificationSubscription)
+  }
+
+  _handleNotification = ({origin, data}) => {
+    console.log(origin, data)
+  };
+  
   //<====================================================> UPDATE INITAL DATA
   Update_Initial_Data = Name => {
     fetch(`${Server_IP}:3000/Update_Initial_Data?username=` + Name)
       .then(response => response.json())
       .then(json => {
         if (json.success) {
-          console.log(json, "MESSAGE TO UPDATE INITIAL DATA");
+          console.log("Initial Data Updated");
 
           this.setState({
             Comprimidos_Show: json.Comprimidos_Show,
@@ -247,7 +280,41 @@ export default class App extends React.Component {
             />
           }
         />
-        <View style={styles.container} />
+        <View>
+          {this.state.Estado_Toma ? (
+            <View
+              style={{
+                marginTop: 30,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <Image
+                source={require("../assets/pill1.png")}
+                style={{
+                  height: 400,
+                  width: 200
+                }}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                marginTop: 30,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <Image
+                source={require("../assets/pill0.png")}
+                style={{
+                  height: 400,
+                  width: 200
+                }}
+              />
+            </View>
+          )}
+        </View>
 
         {/*POP-UP OF SETTINGS  <=========================================================================> */}
         <Modal
@@ -339,6 +406,13 @@ const styles = StyleSheet.create({
   },
   ToogleComprimidos: {
     marginTop: 350
+  },
+  logo: {
+    height: 200,
+    marginBottom: 20,
+    marginTop: 50,
+    padding: 10,
+    width: 200
   }
 });
 

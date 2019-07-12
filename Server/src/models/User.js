@@ -1,19 +1,16 @@
-
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 //mongoose.Shema is a document data structure that is enforced via application layer!
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
-    unique:true,
-    required: true,
-    default: ''
+    unique: true,
+    required: true
   },
   Topic: {
     type: String,
-    unique:true,
-    required: true,
-    default: ''
+    unique: true,
+    required: true
   },
   Clicks: {
     type: Array,
@@ -25,9 +22,7 @@ const UserSchema = new mongoose.Schema({
   },
   Hora_Preferencia: {
     type: String,
-    unique:true,
-    required: true,
-    default: ''
+    default: ""
   },
   Comprimidos: {
     type: Number,
@@ -41,23 +36,24 @@ const UserSchema = new mongoose.Schema({
     type: Array,
     default: []
   },
-
+  token_notificationID: {
+    type: String,
+    default: ""
+  },
 
   //info to identify and contact the user
   Full_Name: {
     type: String,
-    default: ''
+    default: ""
   },
   Email: {
     type: String,
-    unique:true,
-    default: ''
+    default: ""
   },
   Tell_number: {
     type: Number,
-    unique:true,
     default: 0
   }
 });
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);
