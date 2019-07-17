@@ -62,8 +62,15 @@ var client = mqtt.connect("mqtt://m24.cloudmqtt.com", {
 
 client.on("connect", function() {
   //Automaticamente todos os topicos!
-  client.subscribe("Clip1");
-  client.subscribe("Msg_Num");
+  User.find({},(err, users)=>{
+    
+    if (err) return handleError(err);
+
+      for (let user of users){
+        client.subscribe(user.Topic);
+      }
+    })
+  
 });
 
 
