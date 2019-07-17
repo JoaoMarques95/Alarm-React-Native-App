@@ -37,7 +37,7 @@ function diff_minutes(hora_pref,name) {
   var minutes = diff / 1000 /60;
   var horas = diff / 1000 /60/60;
   //console.log(`${minutes} MINUTES\n ${horas} HOURS\n  User ${name} delay to his chosen hour --> ${hora_pref}`);
-  return [minutes,name];
+  return [minutes,name, horas];
 }
 
 
@@ -67,8 +67,12 @@ function send_Push_notification(setings){
 
 
 module.exports = (User,app) => {
-  User.find({},(err, users)=>{
 
+  setTimeout(() => {
+      
+  }, timeout);
+  User.find({},(err, users)=>{
+    
     if (err) return handleError(err);
 
       for (let user of users){
@@ -94,10 +98,10 @@ module.exports = (User,app) => {
         
         //SENDING!
         if(user.Hora_Preferencia){
-          var [time, name] = diff_minutes(user.Hora_Preferencia,user.username);
+          var [time, name, Hora] = diff_minutes(user.Hora_Preferencia,user.username);
 
           //Meia hora antes!
-          while(time >=-30 && time <0 && sendedAntesHora && !user.Toma){
+          if(time >=-30 && time <0 && !sendedAntesHora && !user.Toma){
             sendedAntesHora=true;
             console.log(`ola ${name}, não se esqueça da sua toma em 30 minutos`);
             send_Push_notification(setings)
@@ -105,22 +109,16 @@ module.exports = (User,app) => {
           }
 
           //Na hora!
-          while(time >=0 && time <1 && sendedHora && !user.Toma){
+          if(time >=0 && time <1 && !sendedHora && !user.Toma){
             sendedHora=true;
             console.log('está na hora da sua toma:' + name);
             //Aparcer alarme com a opção para adiar 
           }
-          while(time >=1 && !user.Toma ){
-            setTimeout(() => {
+          if(time >=1 && !user.Toma ){
               console.log('está atrasado: '+name);
-              
-              //Aparcer alarme com a opção para adiar até a utilizadora carregar no botão
-
-
-
-
-            }, timeout);
+              //Aparcer alarme com a opção para adiar até a utilizadora carregar no 
           }
+
           
           
 
@@ -132,6 +130,10 @@ module.exports = (User,app) => {
   
               
           // com  send_Push_notification('defeniçoes');
+          //===================================//
+//===================================//
+//===================================//
+
         }
         
       }
