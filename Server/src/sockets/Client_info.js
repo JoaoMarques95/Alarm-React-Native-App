@@ -1,19 +1,19 @@
-//SERVER SIDE
+// SERVER SIDE
 
-var clients = [];
+const clients = [];
 
-socket.on("storeClientInfo", function(data) {
-  //Listening Client info on connect!
-  var clientInfo = new Object();
+socket.on('storeClientInfo', function(data) {
+  // Listening Client info on connect!
+  const clientInfo = new Object();
   clientInfo.customId = data.customId;
   clientInfo.clientId = socket.id;
   clients.push(clientInfo);
 });
 
-socket.on("disconnect", function(data) {
-  //Listening Client info on Disconect!
-  for (var i = 0, len = clients.length; i < len; ++i) {
-    var c = clients[i];
+socket.on('disconnect', function(data) {
+  // Listening Client info on Disconect!
+  for (let i = 0, len = clients.length; i < len; ++i) {
+    const c = clients[i];
 
     if (c.clientId == socket.id) {
       clients.splice(i, 1);
@@ -22,8 +22,8 @@ socket.on("disconnect", function(data) {
   }
 });
 
-//CLIENT SIDE
-socket.on("connect", function(data) {
+// CLIENT SIDE
+socket.on('connect', function(data) {
   // Sending Client info on connect
-  socket.emit("storeClientInfo", { customId: "000CustomIdHere0000" });
+  socket.emit('storeClientInfo', { customId: '000CustomIdHere0000' });
 });

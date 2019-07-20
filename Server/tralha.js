@@ -29,9 +29,7 @@ Users_notifications_data = require("./src/notifications/registerForPushNotificat
     }
     console.log(clients, "situação Atual");
   }
-);*/
-
-
+); */
 
 /*
 To use the web socket, just send the data/message over a named channel.
@@ -41,7 +39,7 @@ This is identical for both server and client. The other end just has to listen t
 socket.on('channel-name', (message) => ... some logic );
  */
 
-/*const app = express();
+/* const app = express();
 var server = http.Server(app);
 var websocket_io = socketio(server);
 const Click = "data from socket"; //variavel global

@@ -1,23 +1,13 @@
 const User = require('../models/User.js');
 
-module.exports = (app) => {
+module.exports = app => {
+  app.post('/createuser', function(req, res) {
+    const { body } = req;
+    const { username, Topic, Full_Name, Email, Tell_number } = body;
 
-    
-app.post('/createuser', function(req, res) {
+    console.log('entrou no post');
 
-  const { body } =req;
-    const {
-        username,
-        Topic,
-        Full_Name,
-        Email,
-        Tell_number
-    } = body;
-
-    console.log('entrou no post')
-
-
-/* User.find({ 
+    /* User.find({ 
       username: username,
       Topic: Topic,
       Full_Name: Full_Name,
@@ -41,24 +31,23 @@ app.post('/createuser', function(req, res) {
         }
     }
     ) */
-   User.create({
-          username: username,
-          Topic:Topic,
-          Full_Name: Full_Name,
-          Email: Email,
-          Tell_number: Tell_number,
-        }).then(user => {
-          console.log(user)
-          console.log('Criou user');
-          return res.send({
-            success:true,
-            message: user,
-          });
-        }).catch((err=>{console.log(err)}))
-
-
-
-});
-
-    
-    }
+    User.create({
+      username,
+      Topic,
+      Full_Name,
+      Email,
+      Tell_number,
+    })
+      .then(user => {
+        console.log(user);
+        console.log('Criou user');
+        return res.send({
+          success: true,
+          message: user,
+        });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  });
+};
