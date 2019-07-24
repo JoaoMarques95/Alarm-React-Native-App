@@ -8,7 +8,7 @@ module.exports = (app, User) => {
 
     const { body } = req;
     const { username } = body;
-
+    console.log('entrou');
     if (!username) {
       return res.send({
         success: false,
