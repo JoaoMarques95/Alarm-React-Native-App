@@ -18,17 +18,13 @@ const API_PORT = process.env.API_PORT || 3000;
 Name:Marques
 Pass:Ojk025df.
 */
-mongoose.connect(
-  url,
-  { useCreateIndex: true, useFindAndModify: false, useNewUrlParser: true },
-  function(err, db) {
-    if (err) {
-      console.log('Unable to connect to the mongoDB server. Error:', err);
-    } else {
-      console.log('Connection established to', url);
-    }
+mongoose.connect(url, { useCreateIndex: true, useFindAndModify: false, useNewUrlParser: true }, function(err, db) {
+  if (err) {
+    console.log('Unable to connect to the mongoDB server. Error:', err);
+  } else {
+    console.log('Connection established to', url);
   }
-);
+});
 //= ==================================//
 
 //= === CONFIGURATION ===//

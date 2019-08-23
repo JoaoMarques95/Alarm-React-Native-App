@@ -25,22 +25,18 @@ module.exports = (app, User) => {
 
     const Time_Up = Time.substring(11, 16);
     // Do the update
-    User.findOneAndUpdate(
-      { username: Name },
-      { $set: { Hora_Preferencia: Corrigir_hora(Time_Up) } },
-      (error, doc) => {
-        if (error) {
-          return res.send({
-            success: false,
-            message: 'Something wrong when updating data!',
-          });
-        }
+    User.findOneAndUpdate({ username: Name }, { $set: { Hora_Preferencia: Corrigir_hora(Time_Up) } }, (error, doc) => {
+      if (error) {
         return res.send({
-          success: true,
-          time: `Escolhido: ${Corrigir_hora(Time_Up)}`,
-          message: 'Update Done, Time Updated',
+          success: false,
+          message: 'Something wrong when updating data!',
         });
       }
-    );
+      return res.send({
+        success: true,
+        time: `Escolhido: ${Corrigir_hora(Time_Up)}`,
+        message: 'Update Done, Time Updated',
+      });
+    });
   });
 };

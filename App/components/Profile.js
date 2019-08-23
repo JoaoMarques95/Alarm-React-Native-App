@@ -4,16 +4,18 @@ import { Header, ListItem, Icon, Divider, CheckBox } from 'react-native-elements
 import Modal from 'react-native-modal';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import io from 'socket.io-client';
+import PropTypes from 'prop-types';
+import ImgComprimidos from './ImgComprimidos';
+import StartStop from './StartStop';
 
 // Net Casa-Aveiro:192.168.1.127
 // Net phone:192.168.43.163
 // PCI:192.168.128.1
 // PCI_Coworking:192.168.183.25
-// Net Casa:192.168.1.93
+// Net Casa:192.168.1.83
+const ServerIP = 'http://192.168.1.83';
 
-const Server_IP = 'http://192.168.1.127';
-
-export default class App extends React.Component {
+export default class Profile extends React.Component {
   constructor(props) {
     super(props);
     // <====================================================>STATE INITIALIZATION
@@ -25,31 +27,33 @@ export default class App extends React.Component {
       checked28: false,
       username: '',
       Time: '',
-      Time_show: '',
-      Comprimidos_Show: '',
-      Last_Click: '',
-      Estado_Toma: false,
-      notification: {},
+      TimeShow: '',
+      ComprimidosShow: '',
+      EstadoToma: false,
+      ServerIPGlobal: '',
+      DataCiclo: '',
     };
   }
 
   componentDidMount = () => {
     // <====================================================> UPDATE INITAL DATA
     const { navigation } = this.props;
+    const { ServerIPGlobal } = this.state;
+    this.setState({ ServerIPGlobal: ServerIP });
     const Name = navigation.getParam('Username', 'no-name');
+    console.log(ServerIP, 'ServerIPvalue');
     this.setState({ username: Name });
-    this.Update_Initial_Data(Name);
 
+    this.UpdateInitialData(Name);
     // <====================================================> WEB sockets CONFIG
     // we gonna do this.soket because we need to acess this varibale in any place in our component
-    this.socket = io(`${Server_IP}:3000`); // just like this.state
+    this.socket = io(`${ServerIP}:3000`); // just like this.state
 
     // <====================================================> WEB sockets RECEIVING DATA
     this.socket.on('teste', data => {
       console.log(data, 'Data from sokets');
       this.setState({
-        Last_Click: data.Click,
-        Estado_Toma: data.Toma,
+        EstadoToma: data.Toma,
       });
     });
   };
@@ -59,19 +63,19 @@ export default class App extends React.Component {
   }; */
 
   // <====================================================> UPDATE INITAL DATA
-  Update_Initial_Data = Name => {
-    fetch(`${Server_IP}:3000/Update_Initial_Data?username=${Name}`)
+  UpdateInitialData = Name => {
+    fetch(`${ServerIP}:3000/Update_Initial_Data?username=${Name}`)
       .then(response => response.json())
       .then(json => {
         if (json.success) {
           console.log('Initial Data Updated');
-
           this.setState({
-            Comprimidos_Show: json.Comprimidos_Show,
+            // Adicionar DataCiclo!!!!!
+            ComprimidosShow: json.ComprimidosShow,
             checked21: json.check21,
             checked28: json.check28,
             Time: json.time,
-            Time_show: json.time_show,
+            TimeShow: json.timeShow,
           });
         }
       });
@@ -79,8 +83,9 @@ export default class App extends React.Component {
 
   // <====================================================>  Update Comprimidos to the Database (POST)
 
-  Update_Comprimidos = () => {
-    fetch(`${Server_IP}:3000/Update_Comprimidos`, {
+  UpdateComprimidos = () => {
+    const { username, checked21, checked28 } = this.state;
+    fetch(`${ServerIP}:3000/Update_Comprimidos`, {
       // fetch localhost server adress
       method: 'POST',
       headers: {
@@ -89,9 +94,9 @@ export default class App extends React.Component {
       },
       body: JSON.stringify({
         // what is the body of the sended message?
-        Name: this.state.username,
-        Comprimidos28: this.state.checked28,
-        Comprimidos21: this.state.checked21,
+        Name: username,
+        Comprimidos28: checked28,
+        Comprimidos21: checked21,
       }),
     })
       .then(response => response.json()) // conver to js the messsage received
@@ -99,7 +104,7 @@ export default class App extends React.Component {
         if (res.success === true) {
           // Update the state
           console.log(res.message);
-          this.setState({ Comprimidos_Show: res.comprimidos });
+          this.setState({ ComprimidosShow: res.comprimidos });
         } else {
           console.log(res.message);
         }
@@ -109,8 +114,9 @@ export default class App extends React.Component {
 
   // <====================================================> Update to the Database Pref_Time (POST)
 
-  Update_Time = () => {
-    fetch(`${Server_IP}:3000/Update_Time`, {
+  UpdateTime = () => {
+    const { username, Time } = this.state;
+    fetch(`${ServerIP}:3000/Update_Time`, {
       // fetch localhost server adress
       method: 'POST',
       headers: {
@@ -119,8 +125,8 @@ export default class App extends React.Component {
       },
       body: JSON.stringify({
         // what is the body of the sended message?
-        Name: this.state.username,
-        Time: this.state.Time,
+        Name: username,
+        Time,
       }),
     })
       .then(response => response.json()) // conver to json the messsage received
@@ -128,7 +134,7 @@ export default class App extends React.Component {
         if (res.success === true) {
           // check if user exists
           console.log(res.message);
-          this.setState({ Time_show: res.time });
+          this.setState({ TimeShow: res.time });
         } else {
           console.log('some error ocurred');
         }
@@ -148,13 +154,13 @@ export default class App extends React.Component {
         this.setState({ checked28: false }, () => {
           if (this.state.checked21) {
             // if true
-            this.Update_Comprimidos();
+            this.UpdateComprimidos();
           }
         });
       }
 
       if (!this.state.checked28 && this.state.checked21) {
-        this.Update_Comprimidos();
+        this.UpdateComprimidos();
       }
     }); // change state
   };
@@ -173,13 +179,13 @@ export default class App extends React.Component {
           // if true
           this.setState({ checked21: false }, () => {
             if (this.state.checked28) {
-              this.Update_Comprimidos();
+              this.UpdateComprimidos();
             }
           });
         }
 
         if (!this.state.checked21 && this.state.checked28) {
-          this.Update_Comprimidos();
+          this.UpdateComprimidos();
         }
         // Make the request to the database!!!
       }
@@ -191,7 +197,7 @@ export default class App extends React.Component {
     console.log('A time has been picked: ', time);
     this._hideTimePicker();
     this.setState({ Time: time }, () => {
-      this.Update_Time();
+      this.UpdateTime();
     });
   };
 
@@ -206,102 +212,166 @@ export default class App extends React.Component {
 
   // <====================================================> Going back to home
   goBack = () => {
-    this.props.navigation.navigate('Home'); // go to the member area page
+    const { navigation } = this.props;
+    navigation.navigate('Home'); // go to the member area page
   };
 
   // <====================================================> Comprimidos POP-UP
   toggleModalComprimidos = () => {
+    const { isModalVisibleComprimidos } = this.state;
+
     this.setState({
-      isModalVisibleComprimidos: !this.state.isModalVisibleComprimidos,
+      isModalVisibleComprimidos: !isModalVisibleComprimidos,
+    });
+  };
+
+  toggleModalInicioCiclo = () => {
+    const { isModalVisibleInicioCiclo, DataCiclo } = this.state;
+
+    if (DataCiclo) {
+      // update dataciclo
+    } else {
+      // only update data ciclo
+      this.setState({
+        isModalVisibleInicioCiclo: !isModalVisibleInicioCiclo,
+      });
+    }
+  };
+
+  // <====================================================> Inicio Ciclo POP-UP
+  toggleModalTerminarCiclo = () => {
+    const { isModalVisibleTerminarCiclo } = this.state;
+
+    this.setState({
+      isModalVisibleTerminarCiclo: !isModalVisibleTerminarCiclo,
+    });
+  };
+
+  // <====================================================> Terminar Ciclo POP-UP
+  toggleModalComprimidos = () => {
+    const { isModalVisibleComprimidos } = this.state;
+
+    this.setState({
+      isModalVisibleComprimidos: !isModalVisibleComprimidos,
     });
   };
 
   // <====================================================> Setings POP_UP
   toggleModal = () => {
-    this.setState({ isModalVisible: !this.state.isModalVisible });
+    const { isModalVisible } = this.state;
+    this.setState({ isModalVisible: !isModalVisible });
   };
 
   render() {
+    const {
+      isTimePickerVisible,
+      ComprimidosShow,
+      TimeShow,
+      username,
+      DataCiclo,
+      EstadoToma,
+      isModalVisible,
+      isModalVisibleComprimidos,
+      checked21,
+      checked28,
+      ServerIPGlobal,
+    } = this.state;
+
     return (
       <ScrollView style={styles.wrapper}>
         {/* BODY  <=========================================================================> */}
-        <Header //
+        <Header
           containerStyle={{ height: Platform.OS === 'ios' ? 70 : 70 - 15, paddingTop: 5, paddingBottom: 5 }}
           color="#ecf0f1"
           leftComponent={<Icon name="arrow-back" color="#ecf0f1" onPress={this.goBack} Component={TouchableOpacity} />}
           centerComponent={{
-            text: `OLA ${this.state.username.toUpperCase()}`,
+            text: `OLA ${username.toUpperCase()}`,
             style: { color: '#fff' },
           }}
           rightComponent={
             <Icon name="settings" color="#ecf0f1" onPress={this.toggleModal} Component={TouchableOpacity} />
           }
         />
-        <View>
-          {this.state.Estado_Toma ? (
-            <View
-              style={{
-                marginTop: 30,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Image
-                source={require('../assets/pill1.png')}
-                style={{
-                  height: 400,
-                  width: 200,
-                }}
-              />
-            </View>
-          ) : (
-            <View
-              style={{
-                marginTop: 30,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Image
-                source={require('../assets/pill0.png')}
-                style={{
-                  height: 400,
-                  width: 200,
-                }}
-              />
-            </View>
-          )}
-        </View>
+
+        <ImgComprimidos />
+        {/* Aparecer os dados proxima toma, ultima toma */}
+        {/*  <StartStop ServerIPGlobal={ServerIPGlobal} CycleState={CycleState} username={username} DataCiclo={DataCiclo} />
+         */}
 
         {/* POP-UP OF SETTINGS  <=========================================================================> */}
         <Modal
           useNativeDriver
           swipeDirection="right"
           transparent
-          isVisible={this.state.isModalVisible}
+          isVisible={isModalVisible}
           onBackdropPress={() => this.setState({ isModalVisible: false })}
         >
+          <View>
+            <Icon
+              name="close"
+              color="#ecf0f1"
+              onPress={this.toggleModal}
+              backgroundColor="white"
+              Component={TouchableOpacity}
+              size={30}
+              iconStyle={{ padding: 5 }}
+            />
+          </View>
           <ListItem
             title="Que horas custumas tomar?"
-            subtitle={`${this.state.Time_show}`}
+            subtitle={TimeShow === '' ? null : `${TimeShow}`}
             titleStyle={{}}
             subtitleStyle={{ alignItems: 'center', justifyContent: 'center' }}
             leftIcon={{ name: 'timer' }} // timer
-            RightIcon={{ name: 'arrow-forward' }} // timer
             onPress={this._showTimePicker}
             Component={TouchableOpacity}
           />
           <View>
-            <Divider style={{ height: 3, backgroundColor: '#ecf0f1' }} />
+            <Divider style={styles.divider} />
           </View>
           <ListItem
             title="Quantos comprimidos tem a sua caixa?"
-            subtitle={`${this.state.Comprimidos_Show}`}
+            subtitle={ComprimidosShow === '' ? null : `${ComprimidosShow}`}
             titleStyle={{}}
             subtitleStyle={{ alignItems: 'center', justifyContent: 'center' }}
-            leftIcon={{ name: 'system-update' }} // timer
-            RightIcon={{ name: 'arrow-forward' }} // timer
-            onPress={this.toggleModalComprimidos}
+            leftIcon={{ type: 'material-community', name: 'pill' }} // timer -- pills
+            onPress={() => {
+              this.toggleModalComprimidos();
+              this.toggleModal();
+            }}
+            Component={TouchableOpacity}
+          />
+          <View>
+            <Divider style={styles.divider} />
+          </View>
+          <ListItem
+            title={DataCiclo === '' ? 'Iniciar Ciclo' : 'Reniciar ciclo'}
+            subtitle={DataCiclo === '' ? null : `${DataCiclo}`}
+            titleStyle={{}}
+            subtitleStyle={{ alignItems: 'center', justifyContent: 'center' }}
+            leftIcon={
+              DataCiclo === ''
+                ? { type: 'material-community', name: 'clock-start' }
+                : { type: 'material-community', name: 'restart' }
+            } // timer
+            onPress={() => {
+              this.toggleModalInicioCiclo();
+              this.toggleModal();
+            }}
+            Component={TouchableOpacity}
+          />
+          <View>
+            <Divider style={styles.divider} />
+          </View>
+          <ListItem
+            title="Terminar Ciclo"
+            titleStyle={{}}
+            subtitleStyle={{ alignItems: 'center', justifyContent: 'center' }}
+            leftIcon={{ type: 'material-community', name: 'restart-off' }} // timer
+            onPress={() => {
+              this.toggleModalTerminarCiclo();
+              this.toggleModal();
+            }}
             Component={TouchableOpacity}
           />
         </Modal>
@@ -309,11 +379,9 @@ export default class App extends React.Component {
         {/* MODAL OF COMPRIMIDOS <=========================================================================> */}
         <Modal
           useNativeDriver
-          style={styles.ToogleComprimidos}
           animationIn="slideInLeft"
           animationOut="slideOutRight"
-          backdropOpacity={0}
-          isVisible={this.state.isModalVisibleComprimidos}
+          isVisible={isModalVisibleComprimidos}
           onBackdropPress={() => this.setState({ isModalVisibleComprimidos: false })}
         >
           <CheckBox
@@ -321,23 +389,32 @@ export default class App extends React.Component {
             title="21 Comprimidos"
             checkedIcon="dot-circle-o"
             uncheckedIcon="circle-o"
-            onPress={this.check21}
-            checked={this.state.checked21}
+            onPress={() => {
+              this.check21();
+              this.toggleModal();
+            }}
+            checked={checked21}
           />
           <CheckBox
             center
             title="28 Comprimidos"
             checkedIcon="dot-circle-o"
             uncheckedIcon="circle-o"
-            onPress={this.check28}
-            checked={this.state.checked28}
+            onPress={() => {
+              this.check28();
+              this.toggleModal();
+            }}
+            checked={checked28}
           />
         </Modal>
+
+        {/* MODAL OF Iniciar/Reneciar ciclo <=========================================================================> */}
+        {/* MODAL OF Terminar ciclo <=========================================================================> */}
 
         {/* DateTimePicker <=========================================================================> */}
 
         <DateTimePicker // I need to swift the hour +1 because of the timezone (tranquilo)
-          isVisible={this.state.isTimePickerVisible}
+          isVisible={isTimePickerVisible}
           onConfirm={this._handleTimePicked}
           onCancel={this._hideTimePicker}
           mode="time"
@@ -352,6 +429,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: '#ecf0f1',
   },
+  divider: { height: 3, backgroundColor: '#ecf0f1' },
   container: {
     flexGrow: 1,
     alignItems: 'center',
@@ -359,9 +437,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ecf0f1',
     paddingLeft: 40,
     paddingRight: 40,
-  },
-  ToogleComprimidos: {
-    marginTop: 350,
   },
   logo: {
     height: 200,
@@ -371,3 +446,7 @@ const styles = StyleSheet.create({
     width: 200,
   },
 });
+
+Profile.propTypes = {
+  navigation: PropTypes.any,
+};

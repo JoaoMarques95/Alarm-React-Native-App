@@ -1,11 +1,11 @@
-check28 = comprimidos => {
+const check28 = comprimidos => {
   if (comprimidos === 28) {
     return true;
   }
   return false;
 };
 
-check21 = comprimidos => {
+const check21 = comprimidos => {
   if (comprimidos === 21) {
     return true;
   }
@@ -41,11 +41,11 @@ module.exports = (app, User) => {
 
         return res.send({
           success: true,
-          time_show: `Escolhido: ${Hora}`,
+          timeShow: `Escolhido: ${Hora}`,
           time: Hora,
           check28: check28(comprimidos),
           check21: check21(comprimidos),
-          Comprimidos_Show: `Escolhido: ${comprimidos} comprimidos`,
+          ComprimidosShow: `Escolhido: ${comprimidos} comprimidos`,
           message: 'All Updated!',
         });
       }

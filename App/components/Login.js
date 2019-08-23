@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   StyleSheet,
   TextInput,
@@ -13,13 +14,17 @@ import call from 'react-native-phone-call';
 import Modal from 'react-native-modal';
 import AsyncStorage from '@react-native-community/async-storage';
 
+const imgLogo2 = require('../assets/logo2.png');
+const phone = require('../assets/phone.png');
+const gmail = require('../assets/gmail.png');
+
 // Net Casa-Aveiro:192.168.1.127
 // Net phone:192.168.43.163
 // PCI:192.168.128.1
 // PCI_Coworking:192.168.183.25
-// Net Casa:192.168.1.93
+// Net Casa:192.168.1.83
 
-const Server_IP = 'http://192.168.1.127';
+const ServerIP = 'http://192.168.1.83';
 
 const args = {
   number: '911584404', // String value with the number to call
@@ -27,7 +32,6 @@ const args = {
 };
 
 // EMAIL HERE
-
 export default class Login extends Component {
   constructor(props) {
     super(props);
@@ -42,23 +46,29 @@ export default class Login extends Component {
   }
 
   _loadInitialState = async () => {
+    const { navigation } = this.props;
     const value = await AsyncStorage.getItem('user'); // getting username from storage
+
     if (value !== null) {
       // user already loged in
       // Aqui sempre que ele entra tenho que fazer um pedido a base de dados com este valor para perceber se tem a toma feita
       // Dps chamar a função para passar as props para o profile. Para isso é preciso criar um endpoint no servidor diferente.
-      this.props.navigation.navigate('Profile', {
+      navigation.navigate('Profile', {
         Username: value /* params go here */,
       }); // go to the member area page
     }
   };
 
   toggleModal = () => {
-    this.setState({ isModalVisible: !this.state.isModalVisible });
+    const { isModalVisible } = this.state;
+    this.setState({ isModalVisible: !isModalVisible });
   };
 
   login = () => {
-    fetch(`${Server_IP}:3000/login`, {
+    const { username } = this.state;
+    const { navigation } = this.props;
+
+    fetch(`${ServerIP}:3000/login`, {
       // fetch localhost server adress
       method: 'POST',
       headers: {
@@ -67,17 +77,17 @@ export default class Login extends Component {
       },
       body: JSON.stringify({
         // what is the body of the sended message?
-        username: this.state.username, // username is the variable used on node
+        username, // username is the variable used on node
       }),
     })
       .then(response => response.json()) // conver to json the messsage received
       .then(res => {
         if (res.success === true) {
           // check if user exists
-          AsyncStorage.setItem('user', this.state.username);
-          console.log(this.state.username);
-          this.props.navigation.navigate('Profile', {
-            Username: this.state.username,
+          AsyncStorage.setItem('user', username);
+          console.log(username);
+          navigation.navigate('Profile', {
+            Username: username,
           });
         } else {
           this.setState({ username: '' });
@@ -88,18 +98,20 @@ export default class Login extends Component {
   };
 
   render() {
+    const { username, isModalVisible } = this.state;
+
     return (
       <KeyboardAvoidingView style={styles.wrapper}>
         <ScrollView style={styles.wrapper}>
           <View style={styles.container}>
-            <Image source={require('../assets/logo2.png')} style={styles.logo} />
+            <Image source={imgLogo2} style={styles.logo} />
 
             <Text style={styles.header2}>Insira o seu nome!</Text>
             <TextInput
               style={styles.textInput}
               placeholder="Username"
-              onChangeText={username => this.setState({ username })}
-              value={this.state.username}
+              onChangeText={value => this.setState({ username: value })}
+              value={username}
             />
 
             <TouchableOpacity style={styles.btn} onPress={this.login}>
@@ -115,7 +127,7 @@ export default class Login extends Component {
             <Modal
               useNativeDriver
               transparent
-              isVisible={this.state.isModalVisible}
+              isVisible={isModalVisible}
               onBackdropPress={() => this.setState({ isModalVisible: false })}
             >
               <View style={styles.PopupWraper}>
@@ -125,10 +137,10 @@ export default class Login extends Component {
                       onPress={() => {
                         call(args).catch(console.error);
                       }}
-                      source={require('../assets/phone.png')}
+                      source={phone}
                       style={styles.Icon}
                     />
-                    <Image source={require('../assets/gmail.png')} style={styles.Icon} />
+                    <Image source={gmail} style={styles.Icon} />
                   </View>
                   <Text style={styles.Close} onPress={this.toggleModal}>
                     {' '}
@@ -143,6 +155,10 @@ export default class Login extends Component {
     );
   }
 }
+
+Login.propTypes = {
+  navigation: PropTypes.any,
+};
 
 const styles = StyleSheet.create({
   PopupWraper: {

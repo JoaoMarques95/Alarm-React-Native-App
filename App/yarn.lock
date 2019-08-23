@@ -5120,6 +5120,16 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
+react-native-alarm-notification@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/react-native-alarm-notification/-/react-native-alarm-notification-1.3.1.tgz#ee4334234f2c91760f464a82254f9012b0f3eeb4"
+  integrity sha512-B4XC+xYmT3ledEgru8Jup7zTyqQ97ldCZLQx25kUyXJTsRlL6RM8lca6w0SuPSJw33LoTnlSFvE4PNLhz7EFkw==
+
+react-native-alarm@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-alarm/-/react-native-alarm-1.2.0.tgz#058fb0370e95a670d7aceb58bec515082101a13b"
+  integrity sha1-BY+wNw6VpnDXrOtYvsUVCCEBoTs=
+
 react-native-animatable@^1.3.1:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/react-native-animatable/-/react-native-animatable-1.3.2.tgz#4783ee1a73dc98815aef234ce6b819f80bfe7d80"

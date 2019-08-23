@@ -1,0 +1,19 @@
+    //Alarm Try 1:
+    import RNAlarm from 'react-native-alarm';
+
+    let d = new Date().getTime();
+    d += 300 * 1000;
+    RNAlarm.setAlarm(
+      `${d}` /* Convert to string */,
+      'alarm', // y is title to show in the notification
+      '', // isRetry, nullable
+      '', // for android put the mp3 in raw directories project_name/android/app/src/main/res/raw. fileName is the name of the file without the .mp3 extension
+      () => {
+        console.log(`sdgdf to 5 min later`);
+        console.log(d);
+      },
+      () => {
+        console.log('failed alarm');
+        // Fail callback function
+      }
+    );

@@ -1,4 +1,4 @@
-//How to set up git
+//How to set up git  
 https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes
 
 //How to add  files to git
@@ -36,3 +36,10 @@ adb start-server
 
 
 
+
+
+//How to set up in react-native
+
+In the begin of a day always run:
+yarn install 
+react-native link
